@@ -9,3 +9,6 @@ edition = "2018"
 [dependencies]
 colored = "2"
 chrono = "0.4"
+toml = "0.5.8"
+dirs = "3.0.2"
+serde = {version = "1.0", features = ["derive"]}

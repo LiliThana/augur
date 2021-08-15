@@ -1,39 +1,53 @@
 use colored::*;
 use chrono::*;
+use std::path::PathBuf;
+use serde::{Serialize, Deserialize};
+use std::env;
+use std::fs;
 
-// TO DO: Implement easy custom configs
 // TO DO: Implement file to set project level configs
 // TO DO: Implement log file
+// TO DO: Error Handling
 
+#[derive(Serialize, Deserialize)]
 struct Config {
     console_report_lvl: u8,
-    file_report_lvl: u8,
-    mute_list: Vec<u8>,
-    write_to_file: bool,
-    long_time_stamp: bool
+    log_report_lvl: u8,
+    long_time_stamp: bool,
+    log_to_file: bool,
+    use_custom_log_path: bool,
+    custom_log_path: PathBuf
 }
 
 impl Config {
-    pub fn default() -> Config {
-        Config { console_report_lvl: 5, file_report_lvl: 6, mute_list: Vec::new(), write_to_file: false, long_time_stamp: false }
+    pub fn new() -> Config {
+        let cfg = Config::load_config_file();
+        println!("{}", cfg.console_report_lvl);
+        cfg
     }
 
-    pub fn verbose() -> Config {
-        Config { console_report_lvl: 8, file_report_lvl: 8, mute_list: Vec::new(), write_to_file: false, long_time_stamp: true }
+    pub fn load_config_file() -> Config {
+        let mut p = env::current_dir().unwrap_or_else(|e| {
+            panic!("{}: Error getting the current directory.", e);
+        });
+
+        p.push("config/augurcfg.toml");
+        if !p.exists() {
+            fs::copy("config/.augurcfg_default.toml", "config/augurcfg.toml");
+        }
+        let txt = fs::read_to_string(p).unwrap();
+        toml::from_str(txt.as_str()).unwrap()
     }
 }
 
 pub struct Augur {
-    config: Config
+    config: Config,
+
 }
 
 impl Augur {
-    pub fn default() -> Augur {
-        Augur { config: Config::default() }
-    }
-
-    pub fn verbose() -> Augur {
-        Augur { config: Config::verbose() }
+    pub fn new() -> Augur {
+        Augur { config: Config::new() }
     }
 
     pub fn log(&self, message: &str, lvl: u8) {
@@ -54,6 +68,6 @@ impl Augur {
             _ => "NF".white()
         };
 
-        println!("[{}] {}: {}", chrono::Local::now().format("%m-%d-%Y %T").to_string().truecolor(255, 0, 187), header, message);
+        eprintln!("[{}] {}: {}", Local::now().format("%m-%d-%Y %T").to_string().truecolor(255, 0, 187), header, message);
     }
 }

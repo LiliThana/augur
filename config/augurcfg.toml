@@ -1,0 +1,13 @@
+# Configuration File for Augur
+# lowest notification level that Augur will print to the console
+console_report_lvl = 4
+# lowest notification level that Augur will print to the log file
+log_report_lvl = 6
+# false will use "HH:MM:SS" format, true will use "mm-dd-yyy HH:MM:SS" format
+long_time_stamp = false
+# whether to print log to a file
+log_to_file = true
+# whether to use a custom path for the log file
+use_custom_log_path = false
+# the custom path for the log file
+custom_log_path = ""
